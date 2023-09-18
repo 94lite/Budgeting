@@ -2,8 +2,10 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./*"],
+      "@/API/*": ["./app/API/*"],
       "@/components/*": ["./components/*"],
       "@/constants/*": ["./constants/*"],
+      "@/database/*": ["./database/*"]
     }
   }
 }

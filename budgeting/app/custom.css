@@ -1,0 +1,99 @@
+.dashboard {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  height: 100%;
+}
+
+.dashboard .dashboard-left-panel {
+  flex-grow: 1;
+  width: 272px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+
+.dashboard .dashboard-left-panel div {
+  text-align: center;
+}
+
+.dashboard .dashboard-right-panel {
+  flex-grow: 2;
+  width: 408px;
+}
+
+.dashboard .budget {
+  max-width: 320px;
+}
+
+.dashboard .budget .budget-items {
+  padding: 0 16px 8px 16px;
+}
+
+.dashboard .budget button {
+  width: 100%;
+}
+
+.dashboard .current-budget .describer {}
+
+.dashboard .current-budget .value {
+  font-size: xxx-large;
+  margin: 8px 0;
+  border-top: 1px solid;
+}
+
+.dashboard .yesterday-title {
+  border-bottom: 1px solid;
+}
+
+.dashboard .yesterday-budget {
+  display: flex;
+}
+
+.dashboard .yesterday-budget .yesterday-budget-item {
+  width: 0;
+  flex-grow: 1;
+  border-left: 1px solid;
+}
+
+.dashboard .yesterday-budget .yesterday-budget-item:first-of-type {
+  border-left: unset;
+}
+
+.dashboard .yesterday-budget .yesterday-budget-item .describer {
+  font-size: small;
+}
+
+.dashboard .yesterday-budget .yesterday-budget-item .value {
+  margin: 4px 0;
+}
+
+.dashboard .pay-budget {}
+
+.dashboard .pay-budget button {
+  width: 100%;
+}
+
+.dashboard .budget-until-next-pay {}
+
+.dashboard .budget-until-next-pay .value {
+  font-size: xxx-large;
+  margin: 8px 0;
+  border-top: 1px solid;
+}
+
+.dashboard .savings-so-far {
+  margin-bottom: 8px;
+}
+
+.dashboard .savings-so-far .value {
+  font-size: xx-large;
+  margin: 8px 0 0 0;
+  border-top: 1px solid;
+}
+
+.dashboard .savings-so-far .caption {
+  font-size: small;
+}
