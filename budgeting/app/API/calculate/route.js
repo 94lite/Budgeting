@@ -1,15 +1,20 @@
 import { NextResponse } from "next/server";
 import incomes from "@/constants/incomes";
-import expenditures from "@/constants/expenditures";
+import { PrismaClient } from "@prisma/client";
 
 export const GET = async (request) => {
+  const prisma = new PrismaClient();
+  const expenditures = await prisma.expenditures.findMany();
+
   const dailyIncome = incomes.reduce((acc, cur) => {
     return acc + getDailyUnit(cur);
   }, 0);
+
   const dailyExpend = expenditures.reduce((acc, cur) => {
     return acc + getDailyUnit(cur);
   }, 0);
   const dailyDiff = dailyIncome - dailyExpend;
+
   const weeklyIncome = incomes.reduce((acc, cur) => {
     return acc + getWeeklyUnit(cur);
   }, 0);
@@ -17,6 +22,7 @@ export const GET = async (request) => {
     return acc + getWeeklyUnit(cur);
   }, 0);
   const weeklyDiff = weeklyIncome - weeklyExpend;
+
   const fortnightlyIncome = incomes.reduce((acc, cur) => {
     return acc + getFortnightlyUnit(cur);
   }, 0);
@@ -24,6 +30,7 @@ export const GET = async (request) => {
     return acc + getFortnightlyUnit(cur);
   }, 0);
   const fortnightlyDiff = fortnightlyIncome - fortnightlyExpend;
+
   const monthlyIncome = incomes.reduce((acc, cur) => {
     return acc + getMonthlyUnit(cur);
   }, 0);
@@ -31,6 +38,7 @@ export const GET = async (request) => {
     return acc + getMonthlyUnit(cur);
   }, 0);
   const monthlyDiff = monthlyIncome - monthlyExpend;
+
   const yearlyIncome = incomes.reduce((acc, cur) => {
     return acc + getYearlyUnit(cur);
   }, 0);
@@ -38,6 +46,7 @@ export const GET = async (request) => {
     return acc + getYearlyUnit(cur);
   }, 0);
   const yearlyDiff = yearlyIncome - yearlyExpend;
+
   const response = NextResponse.json({
     daily: {
       incomes: dailyIncome,

@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./budgeting.db"
+}
+
+model expenditures {
+  id              Int     @id @unique(map: "sqlite_autoindex_expenditures_1") @default(autoincrement())
+  expenditure     String
+  type            String
+  fixed           Boolean
+  amount          Float?
+  minimum         Float?
+  maximum         Float?
+  frequency       String
+  frequency_value String?
+}
+
+model daily_budget_history {
+  date   DateTime @id
+  budget Float
+  spend  Float?   @default(0)
+}
+
+model expenditures_history {
+  id              Int      @id @unique(map: "sqlite_autoindex_expenditures_history_1") @default(autoincrement())
+  expenditure     String
+  type            String
+  fixed           Boolean
+  amount          Float?
+  minimum         Float?
+  maximum         Float?
+  frequency       String
+  frequency_value String?
+  date_added      DateTime
+}

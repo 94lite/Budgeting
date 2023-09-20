@@ -1,22 +1,45 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Button from "@mui/material/Button";
 import axios from "axios";
+import Button from "@mui/material/Button";
+
+import YesterdayBudget from "./YesterdaysBudget";
+import BudgetSubmitter from "./BudgetSubmitter";
 
 const Dashboard = props => {
+  useEffect(() => {
+    axios.get("/API/expenditures")
+      .then(res => console.log(res.data))
+  }, []);
+  const [budget, setBudget] = useState(0);
+  useEffect(() => {
+    axios.get("/API/calculate")
+      .then(res => {
+        console.log(res.data);
+        const {
+          daily: {
+            incomes,
+            expenditures,
+            difference
+          }
+        } = res.data;
+        setBudget(difference);
+      });
+  }, []);
+
   return (
     <div className="dashboard">
       <div className="dashboard-left-panel">
         <div className="budget">
           <div className="budget-items">
-            <CurrentBudget />
+            <CurrentBudget budget={budget} />
             <div className="yesterday-title">
               Yesterday's
             </div>
             <YesterdayBudget />
           </div>
-          <BudgetSubmitter />
+          <BudgetSubmitter budget={budget} />
         </div>
         <div className="pay-budget">
           <BudgetUntilNextPay />
@@ -35,21 +58,7 @@ const Dashboard = props => {
 };
 
 const CurrentBudget = props => {
-  const [budget, setBudget] = useState(0);
-  useEffect(() => {
-    axios.get("/API/calculate")
-      .then(res => {
-        console.log(res.data);
-        const {
-          daily: {
-            incomes,
-            expenditures,
-            difference
-          }
-        } = res.data;
-        setBudget(difference);
-      });
-  }, []);
+  const { budget } = props;
 
   return (
     <div className="current-budget">
@@ -60,60 +69,6 @@ const CurrentBudget = props => {
         ${budget.toFixed(2)}
       </div>
     </div>
-  )
-};
-
-const YesterdayBudget = props => {
-  const [budget, setBudget] = useState(0);
-  useEffect(() => {
-    axios.get("/API/calculate")
-      .then(res => {
-        const {
-          daily: {
-            incomes,
-            expenditures,
-            difference
-          }
-        } = res.data;
-        setBudget(difference);
-      });
-  }, []);
-  const spend = 20;
-
-  return (
-    <div className="yesterday-budget">
-      <div className="yesterday-budget-item">
-        <div className="describer">
-          Budget
-        </div>
-        <div className="value">
-          ${budget.toFixed(2)}
-        </div>
-      </div>
-      <div className="yesterday-budget-item">
-        <div className="describer">
-          Spend
-        </div>
-        <div className="value">
-          ${spend.toFixed(2)}
-        </div>
-      </div>
-    </div>
-  )
-};
-
-const BudgetSubmitter = props => {
-  const onClick = () => {
-    console.log("hello world");
-  }
-
-  return (
-    <Button
-      variant="contained"
-      onClick={onClick}
-    >
-      Submit
-    </Button>
   )
 };
 
