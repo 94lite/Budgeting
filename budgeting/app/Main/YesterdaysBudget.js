@@ -5,8 +5,8 @@ const YesterdayBudget = props => {
   const [budget, setBudget] = useState(0);
   const [spend, setSpend] = useState(0);
   useEffect(() => {
-    axios.get("/API/history")
-      .then(res => console.log(res));
+    // axios.get("/API/history")
+    //   .then(res => console.log(res));
   }, []);
 
   return (

@@ -7,11 +7,9 @@ import Button from "@mui/material/Button";
 import YesterdayBudget from "./YesterdaysBudget";
 import BudgetSubmitter from "./BudgetSubmitter";
 
+import Projection from "./Projection";
+
 const Dashboard = props => {
-  useEffect(() => {
-    axios.get("/API/expenditures")
-      .then(res => console.log(res.data))
-  }, []);
   const [budget, setBudget] = useState(0);
   useEffect(() => {
     axios.get("/API/calculate")
@@ -50,7 +48,7 @@ const Dashboard = props => {
       <hr />
       <div className="dashboard-right-panel">
         <div>
-          Right Panel
+          <Projection />
         </div>
       </div>
     </div>
