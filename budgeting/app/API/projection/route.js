@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import Expense from "./expense";
+import Income from "./income";
 import { days, months, daysInMonth } from "./constants";
 
 export const GET = async (request) => {
@@ -13,23 +14,25 @@ export const GET = async (request) => {
   const to = searchParams.get("to");
 
   const prisma = new PrismaClient();
-  const data = await prisma.expenditures.findMany();
+  const expenses = await prisma.expenditures.findMany();
+  const incomes = await prisma.incomes.findMany();
   const response = NextResponse.json({
-    minimum: minimum ? getTrend(data, from, to, "minimum", offset) : undefined,
-    maximum: maximum ? getTrend(data, from, to, "maximum", offset) : undefined,
-    custom: custom ? getTrend(data, from, to, custom, offset) : undefined
+    minimum: minimum ? getTrend(expenses, incomes, from, to, "minimum", offset) : undefined,
+    maximum: maximum ? getTrend(expenses, incomes, from, to, "maximum", offset) : undefined,
+    custom: custom ? getTrend(expenses, incomes, from, to, custom, offset) : undefined
   });
   return response;
 };
 
-const getTrend = (items, from, to, dailyOption, offset) => {
+const getTrend = (expenseItems, incomeItems, from, to, dailyOption, offset) => {
   const today = new Date();
   const fromDate = new Date(from || `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`);
   const toDate = new Date(to || `${today.getFullYear()}-12-31`);
   if (fromDate >= toDate) {
     return [];
   }
-  const expenses = getExpenses(items, fromDate);
+  const expenses = getObjects(expenseItems, fromDate);
+  const incomes = getObjects(incomeItems, fromDate);
   switch (dailyOption) {
     case "maximum":
       expenses.daily.push(new Expense({
@@ -50,12 +53,13 @@ const getTrend = (items, from, to, dailyOption, offset) => {
       }));
       break;
   }
-  const trend = calculate(fromDate, toDate, expenses, offset);
+  console.log(incomes)
+  const trend = calculate(fromDate, toDate, expenses, incomes, offset);
   return trend;
 };
 
-const getExpenses = (items, start) => {
-  const expenses = {
+const getObjects = (items, start) => {
+  const objects = {
     yearly: [],
     monthly: [],
     fortnightly: [],
@@ -95,18 +99,23 @@ const getExpenses = (items, start) => {
           break;
       }
     }
-    expenses[frequency].push(new Expense(item, paid));
+    if (item.hasOwnProperty("expenditure")) {
+      objects[frequency].push(new Expense(item, paid));
+    } else if (item.hasOwnProperty("income")) {
+      objects[frequency].push(new Income(item, paid));
+    }
   });
-  return expenses;
+  return objects;
 };
 
-const calculate = (from, to, expenses, offset) => {
-  const { yearly, monthly, fortnightly, weekly, daily } = expenses;
+const calculate = (from, to, expenses, incomes, offset) => {
+  const { yearly: yearlyEx, monthly: monthlyEx, fortnightly: fortnightlyEx, weekly: weeklyEx, daily: dailyEx } = expenses;
+  const { yearly: yearlyIn, monthly: monthlyIn, fortnightly: fortnightlyIn, weekly: weeklyIn, daily: dailyIn } = incomes;
 
   let latest = offset || 0;
   const trend = [];
   let current = from;
-  let outgoing = [];
+  let events = [];
 
   let dayNum;
   let dayName;
@@ -123,73 +132,102 @@ const calculate = (from, to, expenses, offset) => {
     year = current.getFullYear();
     lastDay = daysInMonth(month, year);
 
-    yearly.forEach(expense => {
+    yearlyEx.forEach(expense => {
       const { frequencyValue } = expense;
       if (!expense.paid && frequencyValue) {
         const [m, d] = frequencyValue;
         if (month === m && day === d) {
           latest = latest - expense.getValue();
           expense.setPaid(true);
-          outgoing.push(expense.expenditure);
+          events.push(expense.expenditure);
         }
       }
     });
-    latest = checkAndPay(monthly, day, latest, outgoing);
-    if (trigger) {
-      latest = checkAndPay(fortnightly, dayName, latest, outgoing);
-      if (dayName === "Thursday") {
-        latest = latest + 2065.21;
+    yearlyIn.forEach(income => {
+      const { frequencyValue } = income;
+      if (!income.paid && frequencyValue) {
+        const [m, d] = frequencyValue;
+        if (month === m && day === d) {
+          latest = latest + income.getValue();
+          income.setPaid(true);
+          events.push(income.income);
+        }
       }
+    });
+    latest = checkAndPay(monthlyEx, day, latest, events);
+    latest = checkAndPay(monthlyIn, day, latest, events);
+    if (trigger) {
+      latest = checkAndPay(fortnightlyEx, dayName, latest, events);
+      latest = checkAndPay(fortnightlyIn, dayName, latest, events);
     }
-    latest = checkAndPay(weekly, dayName, latest, outgoing);
-    daily.forEach(expense => {
+    latest = checkAndPay(weeklyEx, dayName, latest, events);
+    latest = checkAndPay(weeklyIn, dayName, latest, events);
+    dailyEx.forEach(expense => {
       latest = latest - expense.getAmount();
-      outgoing.push(expense.expenditure);
+      events.push(expense.expenditure);
+    });
+    dailyIn.forEach(income => {
+      latest = latest + income.getAmount();
+      events.push(income.income);
     });
 
     if (dayName === "Sunday") {
-      latest = calcRemainingAndReset(weekly, latest, outgoing);
+      latest = calcRemainingAndReset(weeklyEx, latest, events);
+      latest = calcRemainingAndReset(weeklyIn, latest, events);
       if (trigger) {
-        latest = calcRemainingAndReset(fortnightly, latest, outgoing);
+        latest = calcRemainingAndReset(fortnightlyEx, latest, events);
+        latest = calcRemainingAndReset(fortnightlyIn, latest, events);
       }
       trigger = !trigger;
     }
     if (day === lastDay) {
-      latest = calcRemainingAndReset(monthly, latest, outgoing);
+      latest = calcRemainingAndReset(monthlyEx, latest, events);
+      latest = calcRemainingAndReset(monthlyIn, latest, events);
     }
     if (month === 11 && day === lastDay) {
-      latest = calcRemainingAndReset(yearly, latest, outgoing);
+      latest = calcRemainingAndReset(yearlyEx, latest, events);
+      latest = calcRemainingAndReset(yearlyIn, latest, events);
     }
     trend.push({
       date: `${day} ${months[month]}, ${dayName}`,
       value: latest,
-      outgoing
+      events
     });
 
     current.setDate(current.getDate() + 1);
-    outgoing = [];
+    events = [];
   }
   return trend;
 };
 
-const checkAndPay = (expenses, compare, latest, outgoing) => {
-  expenses.forEach(expense => {
-    if (!expense.paid && expense.frequencyValue === compare) {
-      latest = latest - expense.getAmount();
-      expense.setPaid(true);
-      outgoing.push(expense.expenditure);
+const checkAndPay = (items, compare, latest, events) => {
+  items.forEach(item => {
+    if (!item.paid && item.frequencyValue === compare) {
+      if (item.hasOwnProperty("expenditure")) {
+        latest = latest - item.getAmount();
+        events.push(`Ex:${item.expenditure}`);
+      } else if (item.hasOwnProperty("income")) {
+        latest = latest + item.getAmount();
+        events.push(`In:${item.income}`);
+      }
+      item.setPaid(true);
     }
   });
   return latest;
 };
 
-const calcRemainingAndReset = (expenses, latest, outgoing) => {
-  expenses.forEach(expense => {
-    if (!expense.paid) {
-      latest = latest - expense.getAmount();
-      outgoing.push(expense.expenditure)
+const calcRemainingAndReset = (items, latest, events) => {
+  items.forEach(item => {
+    if (!item.paid) {
+      if (item.hasOwnProperty("expenditure")) {
+        latest = latest - item.getAmount();
+        events.push(`Ex:${item.expenditure}`);
+      } else if (item.hasOwnProperty("income")) {
+        latest = latest + item.getAmount();
+        events.push(`In:${item.income}`);
+      }
     }
-    expense.setPaid(false);
+    item.setPaid(false);
   });
   return latest;
 };

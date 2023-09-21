@@ -37,3 +37,28 @@ model expenditures_history {
   frequency_value String?
   date_added      DateTime
 }
+
+model incomes {
+  id              Int     @id @unique(map: "sqlite_autoindex_incomes_1") @default(autoincrement())
+  income          String
+  type            String
+  fixed           Boolean
+  amount          Float?
+  minimum         Float?
+  maximum         Float?
+  frequency       String
+  frequency_value String?
+}
+
+model incomes_history {
+  id              Int      @id @unique(map: "sqlite_autoindex_incomes_history_1") @default(autoincrement())
+  income          String
+  type            String
+  fixed           Boolean
+  amount          Float?
+  minimum         Float?
+  maximum         Float?
+  frequency       String
+  frequency_value String?
+  date_added      DateTime
+}
