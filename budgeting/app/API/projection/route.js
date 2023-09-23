@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import Expense from "./expense";
-import Income from "./income";
-import { days, months, daysInMonth } from "./constants";
+import Expense from "@/constants/expense";
+import Income from "@/constants/income";
+import { days, months, daysInMonth } from "@/constants/dates";
 
 export const GET = async (request) => {
   const { searchParams } = request.nextUrl;
@@ -38,9 +38,9 @@ const getTrend = (expenseItems, incomeItems, from, to, dailyOption, offset) => {
       expenses.daily.push(new Expense({
         expenditure: "daily budget",
         fixed: true,
-        amount: 45.50,
+        amount: 40.50,
         frequency: "daily"
-      }));
+      }, true));
       break;
     case "minimum":
       break;
@@ -50,10 +50,9 @@ const getTrend = (expenseItems, incomeItems, from, to, dailyOption, offset) => {
         fixed: true,
         amount: dailyOption,
         frequency: "daily"
-      }));
+      }, true));
       break;
   }
-  console.log(incomes)
   const trend = calculate(fromDate, toDate, expenses, incomes, offset);
   return trend;
 };
@@ -163,12 +162,18 @@ const calculate = (from, to, expenses, incomes, offset) => {
     latest = checkAndPay(weeklyEx, dayName, latest, events);
     latest = checkAndPay(weeklyIn, dayName, latest, events);
     dailyEx.forEach(expense => {
-      latest = latest - expense.getAmount();
-      events.push(expense.expenditure);
+      if (!expense.paid) {
+        latest = latest - expense.getAmount();
+        events.push(expense.expenditure);
+      }
+      expense.setPaid(false);
     });
     dailyIn.forEach(income => {
-      latest = latest + income.getAmount();
-      events.push(income.income);
+      if (!income.paid) {
+        latest = latest + income.getAmount();
+        events.push(income.income);
+      }
+      income.setPaid(false);
     });
 
     if (dayName === "Sunday") {

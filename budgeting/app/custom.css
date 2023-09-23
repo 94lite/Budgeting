@@ -1,3 +1,9 @@
+.title {
+  font-size: x-large;
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
 .dashboard {
   display: flex;
   align-items: stretch;
@@ -21,6 +27,10 @@
 
 .dashboard .dashboard-right-panel {
   flex-grow: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   width: 408px;
 }
 
@@ -96,4 +106,47 @@
 
 .dashboard .savings-so-far .caption {
   font-size: small;
+}
+
+.dashboard .projection {}
+
+.dashboard .accounts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 12px;
+  /* border: 1px solid white; */
+  /* padding: 16px; */
+  width: 100%;
+}
+
+.dashboard .accounts .account {
+  /* border: 1px solid white; */
+  /* padding: 16px; */
+}
+
+.dashboard .accounts .account .account-content {
+  display: flex;
+  gap: 12px;
+  border: 1px solid white;
+}
+
+.dashboard .accounts .account .account-content .panel {
+  padding: 12px;
+  width: 0;
+  flex-grow: 1;
+}
+
+.dashboard .accounts .account .account-content .left-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dashboard .accounts .account .account-content .sub-account {
+  border: 1px solid white;
+  padding: 6px;
+  font-size: small;
+  display: flex;
+  justify-content: space-between;
 }

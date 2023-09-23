@@ -7,14 +7,30 @@ import Button from "@mui/material/Button";
 import YesterdayBudget from "./YesterdaysBudget";
 import BudgetSubmitter from "./BudgetSubmitter";
 
+import Accounts from "./Accounts/Accounts";
 import Projection from "./Projection";
 
 const Dashboard = props => {
   const [budget, setBudget] = useState(0);
   useEffect(() => {
+    axios.get(
+      "/API/income/divide",
+      {
+        params: {
+          date: "2023-09-28",
+          frequency: "fortnightly"
+        }
+      }
+    ).then(res => {
+      console.log(res.data.reduce((acc, cur) => [
+        acc[0] + cur["dividedAmount"],
+        acc[1] + cur["amountInBuffer"]
+      ], [0, 0]));
+    });
+  }, []);
+  useEffect(() => {
     axios.get("/API/calculate")
       .then(res => {
-        console.log(res.data);
         const {
           daily: {
             incomes,
@@ -47,9 +63,10 @@ const Dashboard = props => {
       </div>
       <hr />
       <div className="dashboard-right-panel">
-        <div>
-          <Projection />
-        </div>
+        <div className="title">Accounts</div>
+        <Accounts />
+        <div className="title">Projection</div>
+        <Projection />
       </div>
     </div>
   )

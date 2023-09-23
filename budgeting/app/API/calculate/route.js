@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import incomes from "@/constants/incomes";
 import { PrismaClient } from "@prisma/client";
 
 export const GET = async (request) => {
   const prisma = new PrismaClient();
+  const incomes = await prisma.incomes.findMany();
   const expenditures = await prisma.expenditures.findMany();
 
   const dailyIncome = incomes.reduce((acc, cur) => {

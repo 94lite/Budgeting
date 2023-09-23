@@ -12,8 +12,8 @@ const Projection = props => {
         minimum: 1,
         maximum: 1,
         custom: 25.5,
-        offset: 309.60,
-        to: "2023-12-31"
+        offset: 266.9,
+        to: "2024-01-02"
       }
     })
       .then(res => {
@@ -22,9 +22,9 @@ const Projection = props => {
         for (var i = 0; i < minimum.length; i++) {
           consolidatedData.push({
             date: minimum[i].date,
-            minimumSpend: minimum[i].value,
-            maximumSpend: maximum[i].value,
-            customSpend: custom[i].value
+            "no spend": minimum[i].value,
+            "full spend": maximum[i].value,
+            "custom": custom[i].value
           });
         }
         setData(consolidatedData);
@@ -32,33 +32,49 @@ const Projection = props => {
   }, []);
 
   return (
-    <div>
-      <LineChart
-        width={730}
-        height={250}
-        data={data}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          hide={true}
-          dataKey="date"
-        />
-        <YAxis />
-        <Tooltip
-          content={<CustomTooltip />}
-        />
-        <Legend />
-        <Line type="monotone" dataKey="customSpend" stroke="#42ecf5" />
-        <Line type="monotone" dataKey="maximumSpend" stroke="#82ca9d" />
-        <Line type="monotone" dataKey="minimumSpend" stroke="#8884d8" />
-      </LineChart>
-    </div>
+    <LineChart
+      width={640}
+      height={250}
+      data={data}
+      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+    >
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis
+        hide={true}
+        dataKey="date"
+      />
+      <YAxis />
+      <Tooltip
+        content={<CustomTooltip />}
+      />
+      <Legend />
+      <Line
+        type="linear"
+        dataKey="no spend"
+        stroke="#8884d8"
+        dot={false}
+        isAnimationActive={false}
+      />
+      <Line
+        type="linear"
+        dataKey="custom"
+        stroke="#42ecf5"
+        dot={false}
+        isAnimationActive={false}
+      />
+      <Line
+        type="linear"
+        dataKey="full spend"
+        stroke="#82ca9d"
+        dot={false}
+        isAnimationActive={false}
+      />
+    </LineChart>
   )
 };
 
 const CustomTooltip = ({ active, payload, label }) => {
-  if (!active) {
+  if (!active || !payload) {
     return null;
   }
   return (
@@ -74,15 +90,14 @@ const CustomTooltip = ({ active, payload, label }) => {
       <div>
         {label}
       </div>
-      <div style={{ color: payload[0].stroke }}>
-        ${parseFloat(payload[0].value).toFixed(2)}
-      </div>
-      <div style={{ color: payload[1].stroke }}>
-        ${parseFloat(payload[1].value).toFixed(2)}
-      </div>
-      <div style={{ color: payload[2].stroke }}>
-        ${parseFloat(payload[2].value).toFixed(2)}
-      </div>
+      {payload.map(item => {
+        const { name, value, stroke } = item;
+        return (
+          <div key={name} style={{ color: stroke }}>
+            {name} ${parseFloat(value).toFixed(2)}
+          </div>
+        )}
+      )}
     </div>
   );
 }

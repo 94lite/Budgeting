@@ -1,3 +1,11 @@
+export const spectrum = [
+  "daily",
+  "weekly",
+  "fortnightly",
+  "monthly",
+  "yearly"
+];
+
 export const days = [
   "Sunday",
   "Monday",
