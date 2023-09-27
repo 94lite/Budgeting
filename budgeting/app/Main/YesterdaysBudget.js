@@ -16,7 +16,7 @@ const YesterdayBudget = props => {
           Budget
         </div>
         <div className="value">
-          ${budget.toFixed(2)}
+          $ {budget.toFixed(2)}
         </div>
       </div>
       <div className="yesterday-budget-item">
@@ -24,7 +24,7 @@ const YesterdayBudget = props => {
           Spend
         </div>
         <div className="value">
-          ${spend.toFixed(2)}
+          $ {spend.toFixed(2)}
         </div>
       </div>
     </div>

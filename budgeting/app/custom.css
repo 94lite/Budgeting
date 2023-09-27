@@ -2,6 +2,7 @@
   font-size: x-large;
   margin-top: 16px;
   margin-bottom: 8px;
+  text-align: center;
 }
 
 .dashboard {
@@ -144,9 +145,15 @@
 }
 
 .dashboard .accounts .account .account-content .sub-account {
-  border: 1px solid white;
-  padding: 6px;
+  /* border: 1px solid white; */
+  /* padding: 6px; */
   font-size: small;
+  cursor: pointer;
+}
+
+.dashboard .accounts .account .account-content .sub-account .sub-account-summary {
   display: flex;
   justify-content: space-between;
+  border-bottom: 1px solid white;
+  padding-bottom: 4px;
 }

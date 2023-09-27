@@ -13,22 +13,6 @@ import Projection from "./Projection";
 const Dashboard = props => {
   const [budget, setBudget] = useState(0);
   useEffect(() => {
-    axios.get(
-      "/API/income/divide",
-      {
-        params: {
-          date: "2023-09-28",
-          frequency: "fortnightly"
-        }
-      }
-    ).then(res => {
-      console.log(res.data.reduce((acc, cur) => [
-        acc[0] + cur["dividedAmount"],
-        acc[1] + cur["amountInBuffer"]
-      ], [0, 0]));
-    });
-  }, []);
-  useEffect(() => {
     axios.get("/API/calculate")
       .then(res => {
         const {
@@ -81,7 +65,7 @@ const CurrentBudget = props => {
         Today's Budget
       </div>
       <div className="value">
-        ${budget.toFixed(2)}
+        $ {budget.toFixed(2)}
       </div>
     </div>
   )
@@ -96,7 +80,7 @@ const BudgetUntilNextPay = props => {
         Budget until next pay
       </div>
       <div className="value">
-        ${budget.toFixed(2)}
+        $ {budget.toFixed(2)}
       </div>
     </div>
   )
@@ -127,7 +111,7 @@ const SavingsSoFar = props => {
         Savings so far
       </div>
       <div className="value">
-        ${savings.toFixed(2)}
+        $ {savings.toFixed(2)}
       </div>
       <div className="caption">
         Since {date}

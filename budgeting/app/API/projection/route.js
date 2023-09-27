@@ -8,7 +8,7 @@ export const GET = async (request) => {
   const { searchParams } = request.nextUrl;
   const minimum = parseInt(searchParams.get("minimum") || 0);
   const maximum = parseInt(searchParams.get("maximum") || 0);
-  const custom = parseFloat(searchParams.get("custom") || 0);
+  const custom = searchParams.get("custom") !== undefined ? parseFloat(searchParams.get("custom") || 0) : undefined;
   const offset = parseFloat(searchParams.get("offset") || 0);
   const from = searchParams.get("from");
   const to = searchParams.get("to");
@@ -19,7 +19,7 @@ export const GET = async (request) => {
   const response = NextResponse.json({
     minimum: minimum ? getTrend(expenses, incomes, from, to, "minimum", offset) : undefined,
     maximum: maximum ? getTrend(expenses, incomes, from, to, "maximum", offset) : undefined,
-    custom: custom ? getTrend(expenses, incomes, from, to, custom, offset) : undefined
+    custom: custom !== undefined ? getTrend(expenses, incomes, from, to, custom, offset) : undefined
   });
   return response;
 };
@@ -122,7 +122,7 @@ const calculate = (from, to, expenses, incomes, offset) => {
   let month;
   let year;
   let lastDay;
-  let trigger = false;
+  let trigger = true;
   while (current <= to) {
     dayNum = current.getDay();
     dayName = days[dayNum];
