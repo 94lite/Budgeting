@@ -1,8 +1,11 @@
 .title {
-  font-size: x-large;
+  width: 100%;
   margin-top: 16px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid white;
+  padding-bottom: 4px;
   text-align: center;
+  font-size: x-large;
 }
 
 .dashboard {
@@ -156,4 +159,9 @@
   justify-content: space-between;
   border-bottom: 1px solid white;
   padding-bottom: 4px;
+}
+
+.projection {
+  display: flex;
+  width: 100%;
 }
