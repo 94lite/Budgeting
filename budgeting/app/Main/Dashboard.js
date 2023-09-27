@@ -8,7 +8,7 @@ import YesterdayBudget from "./YesterdaysBudget";
 import BudgetSubmitter from "./BudgetSubmitter";
 
 import Accounts from "./Accounts/Accounts";
-import Projection from "./Projection";
+import Projection from "./Projection/Projection";
 
 const Dashboard = props => {
   const [budget, setBudget] = useState(0);

@@ -10,7 +10,7 @@ const REGEX_TEST = new RegExp(/^\d*\.?\d*$/);
 
 const Projection = props => {
   const [data, setData] = useState([]);
-  const [custom, setCustom] = useState(15);
+  const [custom, setCustom] = useState(23);
   const [input, setInput] = useState(parseFloat(custom).toFixed(2));
   const [revision, setRevision] = useState(0);
   useEffect(() => {
