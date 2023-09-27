@@ -25,9 +25,11 @@ const BasicDatePicker = props => {
           onChange={djs => toDate(djs)}
           sx={{
             color: "white",
+            "&.MuiTextField-root": { minWidth: "unset" },
             "& label": { color: "white", font: "unset" },
             "& label.Mui-focused": { color: "unset" },
             "& .MuiOutlinedInput-root": {
+              width: "160px",
               color: "white",
               fontFamily: "unset",
               "& fieldset": { borderColor: "white" },

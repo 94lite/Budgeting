@@ -46,9 +46,21 @@ const Projection = props => {
       });
   }, [aveSpend, toDate]);
 
+  const today = getTodayDate();
+  const fromDiff = getDifference(today, fromDate);
+  const endDiff = getDifference(today, toDate);
+
   return (
     <div className="projection">
-      <Chart data={data} />
+      <Chart
+        data={endDiff > fromDiff
+          ? data.slice(
+            fromDiff < 0 ? 0 : fromDiff,
+            endDiff + 1
+          )
+          : data
+        }
+      />
       <div>
         <SpendInput
           defaultValue={aveSpend}
@@ -83,6 +95,16 @@ const getEndOfYear = () => {
   const month = 12;
   const day = 31;
   return `${year}-${month}-${day}`
+}
+
+const getDifference = (d1, d2) => {
+  const start = new Date(d1);
+  const end = new Date(d2);
+  const startTime = start.getTime();
+  const endTime = end.getTime();
+  const diffTime = endTime - startTime;
+  const difference = Math.ceil(diffTime / (1000 * 3600 * 24));
+  return difference
 }
 
 export default Projection;
