@@ -45,7 +45,6 @@ const SpendInput = props => {
       variant="outlined"
       label="Estimate Spending"
       size="small"
-      defaultValue={defaultValue}
       value={input}
       onKeyDown={e => validateInputKey(e)}
       onChange={e => onChange(e.target.value)}

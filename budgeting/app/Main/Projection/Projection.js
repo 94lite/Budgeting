@@ -2,9 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+
 import Chart from "./Chart";
 import SpendInput from "./SpendInput";
 import BasicDatePicker from "./DatePicker";
+
+import { getTodayDate, getEndOfYear, getDifference } from "@/constants/dates";
 
 const Projection = props => {
   const [data, setData] = useState([]);
@@ -80,31 +83,5 @@ const Projection = props => {
     </div>
   )
 };
-
-const getTodayDate = () => {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  return `${year}-${month > 9 ? month : `0${month}`}-${day > 9 ? day : `0${day}`}`
-}
-
-const getEndOfYear = () => {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = 12;
-  const day = 31;
-  return `${year}-${month}-${day}`
-}
-
-const getDifference = (d1, d2) => {
-  const start = new Date(d1);
-  const end = new Date(d2);
-  const startTime = start.getTime();
-  const endTime = end.getTime();
-  const diffTime = endTime - startTime;
-  const difference = Math.ceil(diffTime / (1000 * 3600 * 24));
-  return difference
-}
 
 export default Projection;
