@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { spectrum } from "@/constants/dates";
 import Expense from "@/constants/expense";
-import { findAPaymentDate, getPrevDate, getNextDate } from "@/constants/payments-utiltity";
+import { findAPaymentDate, getPrevDate, getNextDate } from "@/constants/payments-utility";
 
 export const GET = async (request) => {
   const { searchParams } = request.nextUrl;

@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import Expense from "@/constants/expense";
 import Income from "@/constants/income";
 import { days, months, daysInMonth } from "@/constants/dates";
+import { getDailyUnit } from "@/API/calculate/route";
 
 export const GET = async (request) => {
   const { searchParams } = request.nextUrl;
@@ -35,10 +36,17 @@ const getTrend = (expenseItems, incomeItems, from, to, dailyOption, offset) => {
   const incomes = getObjects(incomeItems, fromDate);
   switch (dailyOption) {
     case "maximum":
+      const dailyIncome = incomeItems.reduce((acc, cur) => {
+        return acc + getDailyUnit(cur);
+      }, 0);
+      const dailyExpend = expenseItems.reduce((acc, cur) => {
+        return acc + getDailyUnit(cur);
+      }, 0);
+      const dailyDiff = dailyIncome - dailyExpend;
       expenses.daily.push(new Expense({
         expenditure: "daily budget",
         fixed: true,
-        amount: 40.50,
+        amount: dailyDiff,
         frequency: "daily"
       }, true));
       break;
@@ -81,6 +89,7 @@ const getObjects = (items, start) => {
           }
           break;
         case "fortnightly":
+          paid = true;
           break;
         case "weekly":
           if (

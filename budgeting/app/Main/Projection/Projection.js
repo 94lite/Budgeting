@@ -28,7 +28,7 @@ const Projection = props => {
         minimum: 1,
         maximum: 1,
         custom: aveSpend,
-        offset: -811.5,
+        offset: 45.5 + 477.49,
         from: getTodayDate(),
         to: toDate
       }

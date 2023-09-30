@@ -6,15 +6,16 @@ export const GET = async (request) => {
   const incomes = await prisma.incomes.findMany();
   const expenditures = await prisma.expenditures.findMany();
 
+  // Getting daily units
   const dailyIncome = incomes.reduce((acc, cur) => {
     return acc + getDailyUnit(cur);
   }, 0);
-
   const dailyExpend = expenditures.reduce((acc, cur) => {
     return acc + getDailyUnit(cur);
   }, 0);
   const dailyDiff = dailyIncome - dailyExpend;
 
+  // Getting weeklt units
   const weeklyIncome = incomes.reduce((acc, cur) => {
     return acc + getWeeklyUnit(cur);
   }, 0);
@@ -23,6 +24,7 @@ export const GET = async (request) => {
   }, 0);
   const weeklyDiff = weeklyIncome - weeklyExpend;
 
+  // Getting fortnightly units
   const fortnightlyIncome = incomes.reduce((acc, cur) => {
     return acc + getFortnightlyUnit(cur);
   }, 0);
@@ -31,6 +33,7 @@ export const GET = async (request) => {
   }, 0);
   const fortnightlyDiff = fortnightlyIncome - fortnightlyExpend;
 
+  // Getting monthly units
   const monthlyIncome = incomes.reduce((acc, cur) => {
     return acc + getMonthlyUnit(cur);
   }, 0);
@@ -39,6 +42,7 @@ export const GET = async (request) => {
   }, 0);
   const monthlyDiff = monthlyIncome - monthlyExpend;
 
+  // Getting yearly units
   const yearlyIncome = incomes.reduce((acc, cur) => {
     return acc + getYearlyUnit(cur);
   }, 0);
@@ -77,7 +81,7 @@ export const GET = async (request) => {
   return response;
 };
 
-const getDailyUnit = property => {
+export const getDailyUnit = property => {
   const { frequency, amount, minimum, maximum } = property;
   const value = (amount || 0) + (minimum || 0) + (maximum || 0);
 
@@ -96,7 +100,7 @@ const getDailyUnit = property => {
   }
 };
 
-const getWeeklyUnit = property => {
+export const getWeeklyUnit = property => {
   const { frequency, amount, minimum, maximum } = property;
   const value = (amount || 0) + (minimum || 0) + (maximum || 0);
 
@@ -115,7 +119,7 @@ const getWeeklyUnit = property => {
   }
 };
 
-const getFortnightlyUnit = property => {
+export const getFortnightlyUnit = property => {
   const { frequency, amount, minimum, maximum } = property;
   const value = (amount || 0) + (minimum || 0) + (maximum || 0);
 
@@ -134,7 +138,7 @@ const getFortnightlyUnit = property => {
   }
 };
 
-const getMonthlyUnit = property => {
+export const getMonthlyUnit = property => {
   const { frequency, amount, minimum, maximum } = property;
   const value = (amount || 0) + (minimum || 0) + (maximum || 0);
 
@@ -153,7 +157,7 @@ const getMonthlyUnit = property => {
   }
 };
 
-const getYearlyUnit = property => {
+export const getYearlyUnit = property => {
   const { frequency, amount, minimum, maximum } = property;
   const value = (amount || 0) + (minimum || 0) + (maximum || 0);
 

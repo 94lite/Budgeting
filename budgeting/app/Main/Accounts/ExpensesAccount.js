@@ -30,6 +30,12 @@ const ExpensesAccount = props => {
     });
   }, []);
 
+  // for each expenditure,
+  //  - calculate last payment date
+  //  - calculate next due date
+  // extract all payments that were made
+  // for each expenditure post last payment date
+
   return (
     <div>{amount.toFixed(2)}</div>
   )
