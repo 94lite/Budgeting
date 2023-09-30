@@ -3,6 +3,7 @@ export default class Income {
     const {
       id, income,
       type, fixed,
+      progress,
       amount,
       minimum, maximum,
       frequency, frequency_value
@@ -10,6 +11,7 @@ export default class Income {
     this.income = income;
     this.paid = paid || false;
     this.fixed = fixed;
+    this.progress = progress || 0;
     this.amount = amount;
     this.minimum = minimum;
     this.maximum = maximum;
@@ -35,8 +37,11 @@ export default class Income {
     }
   }
 
-  setPaid(status) {
+  setPaid(status, resetProgress) {
     this.paid = status;
+    if (resetProgress) {
+      this.progress = 0;
+    }
   }
   
   getAmount() {

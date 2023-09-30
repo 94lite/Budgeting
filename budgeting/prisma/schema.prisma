@@ -7,26 +7,38 @@ datasource db {
   url      = "file:./budgeting.db"
 }
 
-model expenditures {
-  id              Int     @id @unique(map: "sqlite_autoindex_expenditures_1") @default(autoincrement())
-  expenditure     String
-  type            String
-  fixed           Boolean
-  amount          Float?
-  minimum         Float?
-  maximum         Float?
-  frequency       String
-  frequency_value String?
+model daily_budget_history {
+  date   String @id
+  budget Float
+  spend  Float  @default(0)
 }
 
-model daily_budget_history {
-  date   DateTime @id
-  budget Float
-  spend  Float?   @default(0)
+model expenditure_payments {
+  id              Int    @id @unique(map: "sqlite_autoindex_expenditure_payments_1") @default(autoincrement())
+  payment_date    String
+  expenditure     String
+  amount          Float
+  amount_progress Float
+  amount_due      Float
+  due_date        String
+}
+
+model expenditures {
+  id                Int     @id @unique(map: "sqlite_autoindex_expenditures_1") @default(autoincrement())
+  expenditure       String
+  type              String
+  fixed             Boolean
+  amount            Float?
+  minimum           Float?
+  maximum           Float?
+  frequency         String
+  frequency_value   String?
+  from_credit       Boolean @default(false)
+  payable_over_time Boolean @default(false)
 }
 
 model expenditures_history {
-  id              Int      @id @unique(map: "sqlite_autoindex_expenditures_history_1") @default(autoincrement())
+  id              Int     @id @unique(map: "sqlite_autoindex_expenditures_history_1") @default(autoincrement())
   expenditure     String
   type            String
   fixed           Boolean
@@ -35,7 +47,17 @@ model expenditures_history {
   maximum         Float?
   frequency       String
   frequency_value String?
-  date_added      DateTime
+  date_added      String
+}
+
+model income_payments {
+  id              Int    @id @unique(map: "sqlite_autoindex_income_payments_1") @default(autoincrement())
+  payment_date    String
+  income          String
+  amount          Float
+  amount_progress Float
+  amount_due      Float
+  due_date        String
 }
 
 model incomes {
@@ -51,7 +73,7 @@ model incomes {
 }
 
 model incomes_history {
-  id              Int      @id @unique(map: "sqlite_autoindex_incomes_history_1") @default(autoincrement())
+  id              Int     @id @unique(map: "sqlite_autoindex_incomes_history_1") @default(autoincrement())
   income          String
   type            String
   fixed           Boolean
@@ -60,5 +82,5 @@ model incomes_history {
   maximum         Float?
   frequency       String
   frequency_value String?
-  date_added      DateTime
+  date_added      String
 }

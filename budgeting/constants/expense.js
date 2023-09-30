@@ -3,6 +3,7 @@ export default class Expense {
     const {
       id, expenditure,
       type, fixed,
+      progress,
       amount,
       minimum, maximum,
       frequency, frequency_value
@@ -10,6 +11,7 @@ export default class Expense {
     this.expenditure = expenditure;
     this.paid = paid || false;
     this.fixed = fixed;
+    this.progress = progress || 0;
     this.amount = amount;
     this.minimum = minimum;
     this.maximum = maximum;
@@ -35,14 +37,17 @@ export default class Expense {
     }
   }
 
-  setPaid(status) {
+  setPaid(status, resetProgress) {
     this.paid = status;
+    if (resetProgress) {
+      this.progress = 0;
+    }
   }
   
   getAmount() {
     if (this.fixed) {
-      return this.amount;
+      return this.amount - this.progress;
     }
-    return this.maximum || this.minimum;
+    return (this.maximum || this.minimum) - this.progress;
   }
 };

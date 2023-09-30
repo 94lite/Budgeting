@@ -10,30 +10,54 @@ export const GET = async (request) => {
   const minimum = parseInt(searchParams.get("minimum") || 0);
   const maximum = parseInt(searchParams.get("maximum") || 0);
   const custom = searchParams.get("custom") !== undefined ? parseFloat(searchParams.get("custom") || 0) : undefined;
-  const offset = parseFloat(searchParams.get("offset") || 0);
+  let offset = parseFloat(searchParams.get("offset") || 0);
   const from = searchParams.get("from");
   const to = searchParams.get("to");
 
+  const start = new Date();
+  const defaultFrom = `${start.getFullYear()}-${start.getMonth() + 1}-${start.getDate()}`;
   const prisma = new PrismaClient();
   const expenses = await prisma.expenditures.findMany();
   const incomes = await prisma.incomes.findMany();
+  let paidExpenses = await prisma.expenditure_payments.findMany({
+    where: { due_date: { gte: from || defaultFrom } }
+  });
+  paidExpenses = paidExpenses.reduce((acc, cur) => {
+    const { expenditure, amount_progress, amount_due } = cur;
+    acc[expenditure] = [amount_progress, amount_due];
+    return acc
+  }, {});
+  Object.entries(paidExpenses).forEach(([_, progress]) => {
+    offset = offset + progress[0];
+  });
+  let paidIncomes = await prisma.income_payments.findMany({
+    where: { due_date: { gte: from || defaultFrom } }
+  });
+  paidIncomes = paidIncomes.reduce((acc, cur) => {
+    const { income, amount_progress, amount_due } = cur;
+    acc[income] = [amount_progress, amount_due];
+    return acc
+  }, {});
+  Object.entries(paidIncomes).forEach(([_, progress]) => {
+    offset = offset - progress[0];
+  });
   const response = NextResponse.json({
-    minimum: minimum ? getTrend(expenses, incomes, from, to, "minimum", offset) : undefined,
-    maximum: maximum ? getTrend(expenses, incomes, from, to, "maximum", offset) : undefined,
-    custom: custom !== undefined ? getTrend(expenses, incomes, from, to, custom, offset) : undefined
+    minimum: minimum ? getTrend(expenses, paidExpenses, incomes, paidIncomes, from, to, "minimum", offset) : undefined,
+    maximum: maximum ? getTrend(expenses, paidExpenses, incomes, paidIncomes, from, to, "maximum", offset) : undefined,
+    custom: custom !== undefined ? getTrend(expenses, paidExpenses, incomes, paidIncomes, from, to, custom, offset) : undefined
   });
   return response;
 };
 
-const getTrend = (expenseItems, incomeItems, from, to, dailyOption, offset) => {
+const getTrend = (expenseItems, paidExpenses, incomeItems, paidIncomes, from, to, dailyOption, offset) => {
   const today = new Date();
   const fromDate = new Date(from || `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`);
   const toDate = new Date(to || `${today.getFullYear()}-12-31`);
   if (fromDate >= toDate) {
     return [];
   }
-  const expenses = getObjects(expenseItems, fromDate);
-  const incomes = getObjects(incomeItems, fromDate);
+  const expenses = getObjects(expenseItems, paidExpenses, fromDate);
+  const incomes = getObjects(incomeItems, paidIncomes, fromDate);
   switch (dailyOption) {
     case "maximum":
       const dailyIncome = incomeItems.reduce((acc, cur) => {
@@ -65,7 +89,7 @@ const getTrend = (expenseItems, incomeItems, from, to, dailyOption, offset) => {
   return trend;
 };
 
-const getObjects = (items, start) => {
+const getObjects = (items, paidItems, start) => {
   const objects = {
     yearly: [],
     monthly: [],
@@ -89,8 +113,7 @@ const getObjects = (items, start) => {
           }
           break;
         case "fortnightly":
-          paid = true;
-          break;
+          // if (!trigger) {break}
         case "weekly":
           if (
             (dayNum >= days.indexOf(frequency_value))
@@ -175,14 +198,14 @@ const calculate = (from, to, expenses, incomes, offset) => {
         latest = latest - expense.getAmount();
         events.push(expense.expenditure);
       }
-      expense.setPaid(false);
+      expense.setPaid(false, true);
     });
     dailyIn.forEach(income => {
       if (!income.paid) {
         latest = latest + income.getAmount();
         events.push(income.income);
       }
-      income.setPaid(false);
+      income.setPaid(false, true);
     });
 
     if (dayName === "Sunday") {
@@ -241,7 +264,7 @@ const calcRemainingAndReset = (items, latest, events) => {
         events.push(`In:${item.income}`);
       }
     }
-    item.setPaid(false);
+    item.setPaid(false, true);
   });
   return latest;
 };
