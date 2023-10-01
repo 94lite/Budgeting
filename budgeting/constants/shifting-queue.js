@@ -53,6 +53,19 @@ export class ShiftingQueue {
       }
     }
   }
+
+  asArray() {
+    const arr = [];
+    if (this.head === null) {
+      return arr;
+    }
+    let current = this.head;
+    while (current) {
+      arr.push(current.value);
+      current = current.next;
+    }
+    return arr;
+  }
 };
 
 export class Node {
@@ -64,4 +77,4 @@ export class Node {
   setNext(node) {
     this.next = node;
   }
-}
+};

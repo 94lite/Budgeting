@@ -45,7 +45,11 @@ export default class Expense {
     this.paid = false;
   }
 
-  setPaid() {
+  setPaid(override) {
+    if (override !== undefined) {
+      this.paid = override;
+      return;
+    }
     this.paid = true;
   }
   
@@ -58,7 +62,7 @@ export default class Expense {
 
   setNextDate(skipReset) {
     const strDate = dateToString(this.nextPayDate);
-    getNextDate(strDate, this.frequency);
+    this.nextPayDate = getNextDate(strDate, this.frequency);
     if (skipReset) {
       return;
     }
