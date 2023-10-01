@@ -18,9 +18,18 @@ export const findNextPaymentDate = (strDate, frequency, value) => {
       }
       break;
     case "fortnightly":
+      value = value || "Sunday";
+      date.setDate(date.getDate() + 7);
+      for (var i = 1; i <= 7; i++) {
+        date.setDate(date.getDate() + 1);
+        if (value === days[date.getDay()]) {
+          break;
+        }
+      }
+      break;
     case "weekly":
       value = value || "Sunday";
-      for (var i = 1; i <= 14; i++) {
+      for (var i = 1; i <= 7; i++) {
         date.setDate(date.getDate() + 1);
         if (value === days[date.getDay()]) {
           break;

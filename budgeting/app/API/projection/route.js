@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import Expense from "@/constants/expense";
 import Income from "@/constants/income";
+import { getDailyUnit } from "@/API/calculate/route";
 import { ShiftingQueue, Node } from "@/constants/shifting-queue";
-import { getTodayDate, getEndOfYear, dateToString } from "@/constants/dates";
+import { days, getTodayDate, getEndOfYear, dateToString } from "@/constants/dates";
 import { findNextPaymentDate } from "@/constants/payments-utility";
 
 export const GET = async (request) => {
@@ -27,17 +28,35 @@ export const GET = async (request) => {
     where: { due_date: { gte: from } }
   });
 
-  // setup
-  const expensesQueue = setupQueue(from, expenses, paidExpenses);
-  const incomesQueue = setupQueue(from, incomes, paidIncomes);
-  getTrend(from, to, expensesQueue, incomesQueue);
+  const resData = {};
+  let dailyDiff = 0;
+
+  if (maximum) {
+    const dailyExpend = expenses.reduce((acc, cur) => {
+      return acc + getDailyUnit(cur);
+    }, 0);
+    const dailyIncome = incomes.reduce((acc, cur) => {
+      return acc + getDailyUnit(cur);
+    }, 0);
+    dailyDiff = dailyIncome - dailyExpend;
+  }
+  [
+    ["minimum", minimum, 0],
+    ["custom", custom, -custom],
+    ["maximum", maximum, -dailyDiff]
+  ].forEach(([key, process, value]) => {
+    if (!process) {
+      return;
+    }
+    // setup
+    const expensesQueue = setupQueue(from, expenses, paidExpenses);
+    const incomesQueue = setupQueue(from, incomes, paidIncomes);
+    const trend = getTrend(from, to, expensesQueue, incomesQueue, offset, value);
+    resData[key] = trend;
+  });
 
   // response
-  const response = NextResponse.json({
-    minimum: minimum ? minimum : undefined,
-    custom: custom ? custom : undefined,
-    maximum: maximum ? maximum : undefined
-  });
+  const response = NextResponse.json(resData);
   return response;
 };
 
@@ -94,12 +113,14 @@ const setupQueue = (from, items, paidItems) => {
   return queue;
 };
 
-const getTrend = (startStrDate, endStrDate, expensesQueue, incomesQueue) => {
-  let value = 0;
+const getTrend = (startStrDate, endStrDate, expensesQueue, incomesQueue, offset, dailyPaymentsDiff) => {
+  dailyPaymentsDiff = dailyPaymentsDiff || 0;
+  let value = offset || 0;
   const current = new Date(startStrDate);
   const end = new Date(endStrDate);
   let nextExpense = expensesQueue.peek().value;
   let nextIncome = incomesQueue.peek().value;
+  const trend = []
   while (current <= end) {
     const events = [];
     while ((nextExpense !== null) && (current >= nextExpense.nextPayDate)) {
@@ -124,10 +145,18 @@ const getTrend = (startStrDate, endStrDate, expensesQueue, incomesQueue) => {
       incomesQueue.insert(new Node(nextIncome), compareFunction);
       nextIncome = incomesQueue.peek().value;
     }
-    console.log(value, events);
+    value = value + dailyPaymentsDiff;
+    const dayNum = current.getDay();
+    const dayName = days[dayNum];
+    trend.push({
+      date: `${dateToString(current)}, ${dayName}`,
+      value,
+      events
+    });
     current.setDate(current.getDate() + 1);
   }
-}
+  return trend;
+};
 
 // ____________________
 // U T I L I T Y
