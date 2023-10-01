@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 
 import { AccountValuesContext } from "./Accounts";
 
-import { getTodayDate, getDifference } from "@/constants/dates";
+import { getTodayDate, getDifference } from "@/utility/dates";
 
 const BudgetBufferAccount = props => {
   const { assignedBudget, nextIncomeDate } = props;

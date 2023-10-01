@@ -1,11 +1,16 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import Expense from "@/constants/expense";
-import Income from "@/constants/income";
+
 import { getDailyUnit } from "@/API/calculate/route";
-import { ShiftingQueue, Node } from "@/constants/shifting-queue";
-import { days, getTodayDate, getEndOfYear, dateToString } from "@/constants/dates";
-import { findNextPaymentDate } from "@/constants/payments-utility";
+
+import { days } from "@/constants/dates";
+
+import Expense from "@/models/expense";
+import Income from "@/models/income";
+import { ShiftingQueue, Node } from "@/models/shifting-queue";
+
+import { getTodayDate, getEndOfYear, dateToString } from "@/utility/dates";
+import { findNextPaymentDate } from "@/utility/payments";
 
 export const GET = async (request) => {
   // request parameters

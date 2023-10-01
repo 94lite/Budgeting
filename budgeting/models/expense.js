@@ -1,5 +1,5 @@
-import { getNextDate } from "./payments-utility";
-import { dateToString } from "./dates";
+import { getNextDate } from "@/utility/payments";
+import { dateToString } from "@/utility/dates";
 
 export default class Expense {
   constructor(props, paid, nextPayDate, progress) {

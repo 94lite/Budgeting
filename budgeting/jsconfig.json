@@ -5,7 +5,9 @@
       "@/API/*": ["./app/API/*"],
       "@/components/*": ["./components/*"],
       "@/constants/*": ["./constants/*"],
-      "@/database/*": ["./database/*"]
+      "@/database/*": ["./database/*"],
+      "@/models/*": ["./models/*"],
+      "@/utility/*": ["./utility/*"]
     }
   }
 }

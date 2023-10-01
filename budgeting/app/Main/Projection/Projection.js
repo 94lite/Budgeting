@@ -7,7 +7,7 @@ import Chart from "./Chart";
 import SpendInput from "./SpendInput";
 import BasicDatePicker from "./DatePicker";
 
-import { getTodayDate, getEndOfYear, getDifference } from "@/constants/dates";
+import { getTodayDate, getEndOfYear, getDifference } from "@/utility/dates";
 
 const Projection = props => {
   const [data, setData] = useState([]);

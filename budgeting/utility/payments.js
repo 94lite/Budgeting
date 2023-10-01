@@ -92,4 +92,3 @@ export const getNextDate = (strDate, frequency) => {
   }
   return date;
 };
-

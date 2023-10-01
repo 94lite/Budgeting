@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+
 import { spectrum } from "@/constants/dates";
-import Expense from "@/constants/expense";
-import { findNextPaymentDate, getPrevDate, getNextDate } from "@/constants/payments-utility";
-import { dateToString } from "@/constants/dates";
+
+import Expense from "@/models/expense";
+
+import { dateToString } from "@/utility/dates";
+import { findNextPaymentDate, getPrevDate, getNextDate } from "@/utility/payments";
 
 export const GET = async (request) => {
   const { searchParams } = request.nextUrl;
