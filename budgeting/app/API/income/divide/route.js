@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { spectrum } from "@/constants/dates";
 import Expense from "@/constants/expense";
-import { findAPaymentDate, getPrevDate, getNextDate } from "@/constants/payments-utility";
+import { findNextPaymentDate, getPrevDate, getNextDate } from "@/constants/payments-utility";
+import { dateToString } from "@/constants/dates";
 
 export const GET = async (request) => {
   const { searchParams } = request.nextUrl;
@@ -18,9 +19,9 @@ export const GET = async (request) => {
     let lowerBound;
     let upperBound;
     let dateDate = date ? new Date(date) : new Date();
-    const dateStr = toString(dateDate);
-    let nextPayDate = findAPaymentDate(toString(dateDate), frequency, frequencyValue);
-    const nextPayDateStr = toString(nextPayDate);
+    const dateStr = dateToString(dateDate);
+    let nextPayDate = findNextPaymentDate(dateToString(dateDate), frequency, frequencyValue);
+    const nextPayDateStr = dateToString(nextPayDate);
 
     const previousPayDates = [];
     const futurePayDates = [];
@@ -35,9 +36,9 @@ export const GET = async (request) => {
     };
     if (spectrum.indexOf(freq) > spectrum.indexOf(frequency)) {
       lowerBound = dateDate;
-      upperBound = getNextDate(toString(dateDate), freq);
+      upperBound = getNextDate(dateToString(dateDate), freq);
       while (nextPayDate <= upperBound) {
-        futurePayDates.push(toString(nextPayDate));
+        futurePayDates.push(dateToString(nextPayDate));
         nextPayDate = getNextDate(nextPayDate, frequency);
       }
       output["dividedAmount"] = amount * futurePayDates.length;
@@ -46,13 +47,13 @@ export const GET = async (request) => {
       lowerBound = getPrevDate(nextPayDateStr, frequency);
       upperBound = nextPayDate;
       while (dateDate < upperBound) {
-        futurePayDates.push(toString(dateDate));
-        dateDate = getNextDate(toString(dateDate), freq);
+        futurePayDates.push(dateToString(dateDate));
+        dateDate = getNextDate(dateToString(dateDate), freq);
       }
       dateDate = getPrevDate(dateStr, freq);
       while (dateDate >= lowerBound) {
-        previousPayDates.push(toString(dateDate));
-        dateDate = getPrevDate(toString(dateDate), freq);
+        previousPayDates.push(dateToString(dateDate));
+        dateDate = getPrevDate(dateToString(dateDate), freq);
       }
       previousPayDates.reverse();
       output["dividedAmount"] = amount/(previousPayDates.length + futurePayDates.length);
@@ -64,11 +65,4 @@ export const GET = async (request) => {
   });
   const response = NextResponse.json(data);
   return response;
-};
-
-const toString = date => {
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  return `${year}-${month > 9 ? month : `0${month}`}-${day > 9 ? day : `0${day}`}`;
 };

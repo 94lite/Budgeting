@@ -1,6 +1,6 @@
 import { days, daysInMonth } from "@/constants/dates";
 
-export const findAPaymentDate = (strDate, frequency, value) => {
+export const findNextPaymentDate = (strDate, frequency, value) => {
   const date = new Date(strDate);
   switch (frequency) {
     case "yearly":

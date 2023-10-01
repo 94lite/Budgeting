@@ -1,9 +1,11 @@
+import { getNextDate } from "./payments-utility";
+import { dateToString } from "./dates";
+
 export default class Income {
-  constructor(props, paid) {
+  constructor(props, paid, nextPayDate, progress) {
     const {
       id, income,
       type, fixed,
-      progress,
       amount,
       minimum, maximum,
       frequency, frequency_value
@@ -17,6 +19,7 @@ export default class Income {
     this.maximum = maximum;
     this.frequency = frequency;
     this.frequencyValue = this.parseFrequencyValue(frequency, frequency_value);
+    this.nextPayDate = nextPayDate ? new Date(nextPayDate) : undefined;
   }
 
   parseFrequencyValue(frequency, frequency_value) {
@@ -37,17 +40,28 @@ export default class Income {
     }
   }
 
-  setPaid(status, resetProgress) {
-    this.paid = status;
-    if (resetProgress) {
-      this.progress = 0;
-    }
+  reset() {
+    this.progress = 0;
+    this.paid = false;
+  }
+
+  setPaid() {
+    this.paid = true;
   }
   
   getAmount() {
     if (this.fixed) {
-      return this.amount;
+      return this.amount - this.progress;
     }
-    return this.maximum || this.minimum;
+    return (this.maximum || this.minimum) - this.progress;
+  }
+
+  setNextDate(skipReset) {
+    const strDate = dateToString(this.nextPayDate);
+    getNextDate(strDate, this.frequency);
+    if (skipReset) {
+      return;
+    }
+    this.reset();
   }
 };
