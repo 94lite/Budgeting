@@ -23,7 +23,7 @@ export const GET = async (request) => {
     let upperBound;
     let dateDate = date ? new Date(date) : new Date();
     const dateStr = dateToString(dateDate);
-    let nextPayDate = findNextPaymentDate(dateToString(dateDate), frequency, frequencyValue);
+    let nextPayDate = findNextPaymentDate(dateToString(dateDate), frequency, frequencyValue, true);
     const nextPayDateStr = dateToString(nextPayDate);
 
     const previousPayDates = [];

@@ -1,6 +1,6 @@
 import { days, daysInMonth } from "@/constants/dates";
 
-export const findNextPaymentDate = (strDate, frequency, value) => {
+export const findNextPaymentDate = (strDate, frequency, value, skip) => {
   const date = new Date(strDate);
   switch (frequency) {
     case "yearly":
@@ -19,7 +19,9 @@ export const findNextPaymentDate = (strDate, frequency, value) => {
       break;
     case "fortnightly":
       value = value || "Sunday";
-      date.setDate(date.getDate() + 7);
+      if (!skip) {
+        date.setDate(date.getDate() + 7);
+      }
       for (var i = 1; i <= 7; i++) {
         date.setDate(date.getDate() + 1);
         if (value === days[date.getDay()]) {

@@ -19,7 +19,7 @@ const Accounts = props => {
         <SubAccount title="Day Budget" value={BUDGET} />
         <SubAccount title="Free Spending" />
       </Account>
-      <Account title="Savings" actualValue={563.86}>
+      <Account title="Savings" actualValue={397.27}>
         <SubAccount title="Budget Buffer">
           <BudgetBufferAccount
             assignedBudget={BUDGET}
@@ -37,7 +37,7 @@ const Accounts = props => {
         </SubAccount>
       </Account>
       <Account title="Credit">
-        <SubAccount title="Credit" value={7000 - 7115.93} />
+        <SubAccount title="Credit" value={7000 - 6817.20} />
       </Account>
     </div>
   )

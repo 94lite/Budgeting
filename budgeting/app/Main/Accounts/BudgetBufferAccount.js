@@ -6,6 +6,7 @@ import { getTodayDate, getDifference } from "@/utility/dates";
 
 const BudgetBufferAccount = props => {
   const { assignedBudget, nextIncomeDate } = props;
+
   const context = useContext(AccountValuesContext);
   const { updateAmount } = context;
   const [amount, setAmount] = useState(0);
