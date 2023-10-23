@@ -87,7 +87,7 @@ const getObjectForm = item => {
 
 const setNextPaymentDate = (from, item) => {
   const { frequency, frequencyValue } = item;
-  const nextPayDate = findNextPaymentDate(from, frequency, frequencyValue);
+  const nextPayDate = findNextPaymentDate(from, frequency, frequencyValue, true);
   item.nextPayDate = nextPayDate;
 };
 

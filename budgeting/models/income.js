@@ -28,7 +28,8 @@ export default class Income {
     }
     switch (frequency) {
       case "yearly":
-        return;
+        const [month, day] = frequency_value.split("-");
+        return [parseInt(month) - 1, parseInt(day)];
       case "monthly":
         return parseInt(frequency_value);
       case "fortnightly":

@@ -3,6 +3,65 @@ import axios from "axios";
 
 import { AccountValuesContext } from "./Accounts";
 
+const parsePayments = paidExpenditures => {
+  return paidExpenditures.reduce((acc, cur) => {
+    const { expenditure } = cur
+    if (expenditure in acc) {
+      acc[expenditure].push(cur);
+    } else {
+      acc[expenditure] = [cur];
+    }
+    return acc;
+  }, {});
+}
+
+const parseExpenditures = (expenditures, paidExpenditures) => {
+  const parsed = expenditures.reduce((acc, cur) => {
+    const {
+      expenditure,
+      amount, amountInBuffer,
+      nextPayDate,
+      previousPayDates, futurePayDates,
+      previousTopUpDates, futureTopUpDates
+    } = cur;
+    const parsedItem = {
+      nextPayDate,
+      amountInBuffer,
+      amount
+    };
+    if (expenditure in paidExpenditures) {
+      paidExpenditures[expenditure].forEach(paid => {
+        const { amount: amountPaid } = paid;
+      });
+    }
+    acc[expenditure] = parsedItem;
+    return acc
+  }, {});
+  return parsed
+};
+
+const getAPIs = (lastIncomeDate, frequency) => {
+  return [
+    axios.get(
+      "/API/income/divide",
+      {
+        params: {
+          date: lastIncomeDate,
+          frequency
+        }
+      }
+    ),
+    axios.get(
+      "/API/expenditures/paid",
+      {
+        params: {
+          from: lastIncomeDate
+        }
+      }
+    )
+  ];
+}
+
 const ExpensesAccount = props => {
   const { lastIncomeDate } = props;
 
@@ -10,48 +69,11 @@ const ExpensesAccount = props => {
   const { updateAmount } = context;
   const [amount, setAmount] = useState(0);
   useEffect(() => {
-    axios.get(
-      "/API/income/divide",
-      {
-        params: {
-          date: lastIncomeDate,
-          frequency: "fortnightly"
-        }
-      }
-    ).then(res => {
-      const today = new Date();
-      const paidItems = [];
-      const [dividedAmount, amountInBuffer] = res.data.reduce((acc, cur) => {
-        const {
-          expenditure,
-          dividedAmount, amountInBuffer,
-          previousPayDates, futurePayDates,
-          nextPayDate
-        } = cur;
-        acc[0] = acc[0] + dividedAmount;
-        if (today < new Date(nextPayDate)) {
-          acc[1] = acc[1] + amountInBuffer;
-        } else {
-          paidItems.push(expenditure);
-          const allPayDates = previousPayDates.concat(futurePayDates);
-          let paidCount = 0;
-          let totalCount = 0;
-          allPayDates.forEach(payDate => {
-            if (today >= new Date(payDate)) {
-              paidCount++;
-            }
-            totalCount++;
-          });
-          const fraction = paidCount/totalCount;
-          acc[1] = acc[1] + (1 - fraction) * amountInBuffer;
-        }
-        return acc
-      }, [0, 0]);
-      console.log(dividedAmount, paidItems);
-      setAmount(amountInBuffer);
-      updateAmount
-        ? updateAmount("expenses", amountInBuffer)
-        : null;
+    axios.all(getAPIs(lastIncomeDate, "fortnightly")).then(res => {
+      const [divideResponse, paidResponse] = res;
+      const payments = parsePayments(paidResponse.data);
+      const xyz = parseExpenditures(divideResponse.data, payments);
+      console.log(xyz);
     });
   }, []);
 

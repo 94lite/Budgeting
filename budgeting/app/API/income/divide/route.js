@@ -28,14 +28,14 @@ export const GET = async (request) => {
 
     const previousPayDates = [];
     const futurePayDates = [];
+    const previousTopUpDates = [];
+    const futureTopUpDates = [];
     const output = {
       expenditure,
       amount,
       dividedAmount: amount,
       amountInBuffer: amount,
-      nextPayDate: nextPayDateStr,
-      previousPayDates,
-      futurePayDates
+      nextPayDate: nextPayDateStr
     };
     if (spectrum.indexOf(freq) > spectrum.indexOf(frequency)) {
       lowerBound = dateDate;
@@ -46,23 +46,27 @@ export const GET = async (request) => {
       }
       output["dividedAmount"] = amount * futurePayDates.length;
       output["amountInBuffer"] = output["dividedAmount"];
+      output["previousPayDates"] = previousPayDates;
+      output["futurePayDates"] = futurePayDates;
     } else if (spectrum.indexOf(freq) < spectrum.indexOf(frequency)) {
       lowerBound = getPrevDate(nextPayDateStr, frequency);
       upperBound = nextPayDate;
       while (dateDate < upperBound) {
-        futurePayDates.push(dateToString(dateDate));
+        futureTopUpDates.push(dateToString(dateDate));
         dateDate = getNextDate(dateToString(dateDate), freq);
       }
       dateDate = getPrevDate(dateStr, freq);
       while (dateDate >= lowerBound) {
-        previousPayDates.push(dateToString(dateDate));
+        previousTopUpDates.push(dateToString(dateDate));
         dateDate = getPrevDate(dateToString(dateDate), freq);
       }
-      previousPayDates.reverse();
-      output["dividedAmount"] = amount/(previousPayDates.length + futurePayDates.length);
-      output["amountInBuffer"] = output["dividedAmount"] * (previousPayDates.length + 1);
+      previousTopUpDates.reverse();
+      output["dividedAmount"] = amount/(previousTopUpDates.length + futureTopUpDates.length);
+      output["amountInBuffer"] = output["dividedAmount"] * (previousTopUpDates.length + 1);
+      output["previousTopUpDates"] = previousTopUpDates;
+      output["futureTopUpDates"] = futureTopUpDates;
     } else {
-      futurePayDates.push(nextPayDateStr);
+      output["futurePayDates"] = [nextPayDateStr];
     }
     return output;
   });
